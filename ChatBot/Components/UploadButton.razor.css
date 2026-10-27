@@ -1,0 +1,38 @@
+.upload {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+    .upload:hover {
+        filter: brightness(1.08);
+    }
+
+    .upload.busy {
+        opacity: 0.6;
+        cursor: default;
+    }
+
+    /* The real file input covers the button invisibly so the whole button is clickable. */
+    .upload ::deep input[type=file] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload.subtle {
+        background: transparent;
+        color: var(--accent);
+        border: 1px solid var(--accent);
+    }

@@ -1,0 +1,106 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    padding: 12px;
+    gap: 12px;
+}
+
+.new-chat {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    cursor: pointer;
+    text-align: left;
+    font-weight: 600;
+}
+
+    .new-chat:hover {
+        background: var(--bg-hover);
+    }
+
+.sessions {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.session {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+}
+
+    .session:hover {
+        background: var(--bg-hover);
+    }
+
+    .session.active {
+        background: var(--bg-active);
+    }
+
+    .session a {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        color: var(--fg);
+        text-decoration: none;
+        font-size: 0.92rem;
+    }
+
+.mode-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--fg-muted);
+}
+
+.session.active .mode-icon {
+    color: var(--accent);
+}
+
+.session-title {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.delete {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--fg-muted);
+    font-size: 1.1rem;
+    padding: 4px 10px;
+    visibility: hidden;
+}
+
+.session:hover .delete,
+.session.active .delete {
+    visibility: visible;
+}
+
+.delete:hover {
+    color: var(--danger);
+}
+
+.note {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--fg-muted);
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        width: 180px;
+    }
+}

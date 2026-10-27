@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.user
+models/*.gguf
+
+# Indexing checkpoints, temp files and logs (finished data/index/*.json caches can be committed)
+data/index/*.partial.json
+data/index/*.tmp
+data/*.log

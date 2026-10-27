@@ -1,0 +1,86 @@
+@using ChatBot.Services.Rag
+@implements IDisposable
+@inject DocumentLibrary Library
+@inject IJSRuntime JS
+
+<section class="documents">
+    <div class="documents-header">
+        <h2>Documents</h2>
+        <UploadButton OnResult="errors => _errors = errors" />
+    </div>
+
+    @foreach (var error in _errors)
+    {
+        <p class="message">@error</p>
+    }
+
+    <ul>
+        @foreach (var doc in _documents)
+        {
+            <li @key="doc.Id">
+                <div class="doc-line">
+                    <span class="doc-title" title="@doc.FileName">@doc.Title</span>
+                    @if (doc.IsBuiltIn)
+                    {
+                        <span class="built-in" title="Included with the app; can't be deleted">Built-in</span>
+                    }
+                    else
+                    {
+                        <button class="delete" type="button" title="Delete document" aria-label="Delete document" @onclick="() => DeleteAsync(doc)">×</button>
+                    }
+                </div>
+                <div class="doc-meta">
+                    <span class="status @doc.Status.ToString().ToLowerInvariant()">
+                        @(doc.Status == DocumentStatus.Indexing && doc.Progress > 0 ? $"Indexing {doc.Progress:P0}" : doc.Status.ToString())
+                    </span>
+                    @if (doc.Status != DocumentStatus.Failed && doc.PageCount > 0)
+                    {
+                        <span>@doc.PageCount @(doc.HasPages ? "pages" : "paragraphs") · @doc.ChunkCount chunks</span>
+                    }
+                </div>
+                @if (doc.Status == DocumentStatus.Indexing)
+                {
+                    <div class="progress"><div style="width: @((doc.Progress * 100).ToString("0", System.Globalization.CultureInfo.InvariantCulture))%"></div></div>
+                }
+                @if (doc.Error is not null)
+                {
+                    <div class="doc-error">@doc.Error</div>
+                }
+                else if (doc.Warning is not null)
+                {
+                    <div class="doc-warning">⚠ @doc.Warning</div>
+                }
+            </li>
+        }
+    </ul>
+    @if (_documents.Count == 0)
+    {
+        <p class="empty">No documents yet. Upload a PDF, DOCX, TXT or MD file (max @(Library.MaxUploadBytes / 1024 / 1024) MB).</p>
+    }
+</section>
+
+@code {
+    private IReadOnlyList<DocumentInfo> _documents = [];
+    private IReadOnlyList<string> _errors = [];
+
+    protected override void OnInitialized()
+    {
+        _documents = Library.List();
+        Library.Changed += OnLibraryChanged;
+    }
+
+    private async Task DeleteAsync(DocumentInfo doc)
+    {
+        // Documents are shared by everyone using this app, so confirm first.
+        if (await JS.InvokeAsync<bool>("confirm", $"Delete \"{doc.Title}\" for all users? The file and its index will be removed."))
+            Library.Delete(doc.Id);
+    }
+
+    private void OnLibraryChanged() => _ = InvokeAsync(() =>
+    {
+        _documents = Library.List();
+        StateHasChanged();
+    });
+
+    public void Dispose() => Library.Changed -= OnLibraryChanged;
+}

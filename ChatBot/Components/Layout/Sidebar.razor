@@ -1,0 +1,54 @@
+<aside class="sidebar">
+    <button class="new-chat" type="button" @onclick="OnNewChat">+ New chat</button>
+
+    <nav class="sessions">
+        @foreach (var session in Sessions)
+        {
+            <div class="session @(session.Id == ActiveId ? "active" : "")" @key="session.Id">
+                <a href="@($"chat/{session.Id}")" title="@Tooltip(session)">
+                    <span class="mode-icon" aria-hidden="true">
+                        @if (session.UseDocuments)
+                        {
+                            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zm0 0v5h5M9 13h6M9 17h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        }
+                        else
+                        {
+                            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></svg>
+                        }
+                    </span>
+                    <span class="session-title">@session.Title</span>
+                </a>
+                <button class="delete" type="button" title="Delete chat" aria-label="Delete chat"
+                        @onclick="() => OnDelete.InvokeAsync(session.Id)">×</button>
+            </div>
+        }
+    </nav>
+
+    @if (ShowDocuments)
+    {
+        <DocumentsPanel />
+    }
+
+    <p class="note">Chats are kept in memory only and disappear when the app restarts.@(ShowDocuments ? " Documents are shared by everyone." : "")</p>
+</aside>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<ChatSession> Sessions { get; set; } = [];
+
+    [Parameter]
+    public Guid? ActiveId { get; set; }
+
+    /// <summary>Show the Documents panel (Documents mode).</summary>
+    [Parameter]
+    public bool ShowDocuments { get; set; }
+
+    [Parameter]
+    public EventCallback OnNewChat { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnDelete { get; set; }
+
+    private static string Tooltip(ChatSession session) =>
+        (session.UseDocuments ? "Documents: " : "Chatbot: ") + session.Title;
+}

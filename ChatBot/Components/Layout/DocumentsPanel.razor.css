@@ -1,0 +1,139 @@
+﻿.documents {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 45%;
+    min-height: 120px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.documents-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+    .documents-header h2 {
+        margin: 0;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--fg-muted);
+    }
+
+.progress {
+    height: 4px;
+    margin-top: 5px;
+    border-radius: 2px;
+    background: var(--bg-hover);
+    overflow: hidden;
+}
+
+    .progress div {
+        height: 100%;
+        background: var(--accent);
+        transition: width 0.4s;
+    }
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+li {
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+}
+
+.doc-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.doc-title {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+.built-in {
+    flex-shrink: 0;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--bg-hover);
+    color: var(--fg-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.delete {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--fg-muted);
+    font-size: 1rem;
+    padding: 0 4px;
+}
+
+    .delete:hover {
+        color: var(--danger);
+    }
+
+.doc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    color: var(--fg-muted);
+    font-size: 0.78rem;
+    margin-top: 2px;
+}
+
+.status {
+    font-weight: 600;
+}
+
+    .status.ready { color: #2e7d32; }
+    .status.indexing { color: var(--accent); }
+    .status.failed { color: var(--danger); }
+
+@media (prefers-color-scheme: dark) {
+    .status.ready { color: #81c784; }
+}
+
+.doc-warning,
+.doc-error,
+.message {
+    margin: 4px 0 0;
+    font-size: 0.78rem;
+}
+
+.doc-warning {
+    color: #b26a00;
+}
+
+@media (prefers-color-scheme: dark) {
+    .doc-warning { color: #ffb74d; }
+}
+
+.doc-error,
+.message {
+    color: var(--danger);
+}
+
+.empty {
+    margin: 0;
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <title>ChatBot</title>
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="ChatBot.styles.css" />
+    <HeadOutlet @rendermode="RenderModeNoPrerender" />
+</head>
+
+<body>
+    <Routes @rendermode="RenderModeNoPrerender" UserId="@_userId" />
+    <script src="_framework/blazor.web.js"></script>
+    <script src="chat.js"></script>
+</body>
+
+</html>
+
+@code {
+    // No prerendering: otherwise pages run twice and "/" would create two sessions.
+    private static readonly IComponentRenderMode RenderModeNoPrerender = new InteractiveServerRenderMode(prerender: false);
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    private string _userId = "";
+
+    protected override void OnInitialized()
+    {
+        // Set by the middleware in Program.cs. Passed to the interactive root as a (tamper-proof) parameter.
+        _userId = HttpContext.Items[UserIdCookie.Name] as string ?? "";
+    }
+}

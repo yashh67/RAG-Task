@@ -1,0 +1,57 @@
+@using Ganss.Xss
+@using Markdig
+
+@if (Role == ChatRole.User)
+{
+    <div class="row user">
+        <div class="bubble">@Content</div>
+    </div>
+}
+else
+{
+    <div class="row assistant">
+        <div class="bubble">
+            <div class="markdown">@((MarkupString)RenderMarkdown(Content))</div>
+            @if (Sources.Count > 0)
+            {
+                <details class="sources">
+                    <summary>Sources (@Sources.Count)</summary>
+                    <ol>
+                        @foreach (var source in Sources)
+                        {
+                            <li value="@source.Number">
+                                <div class="source-title">
+                                    <strong>@source.Document</strong>
+                                    <span>@source.Section · @source.Location</span>
+                                </div>
+                                <div class="snippet">@source.Snippet</div>
+                            </li>
+                        }
+                    </ol>
+                </details>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .DisableHtml()
+        .Build();
+
+    private static readonly HtmlSanitizer Sanitizer = new();
+
+    [Parameter]
+    public ChatRole Role { get; set; }
+
+    [Parameter]
+    public string Content { get; set; } = "";
+
+    [Parameter]
+    public IReadOnlyList<SourceRef> Sources { get; set; } = [];
+
+    // Markdown from the model is untrusted: raw HTML is disabled and the output is sanitized.
+    private static string RenderMarkdown(string markdown) =>
+        Sanitizer.Sanitize(Markdown.ToHtml(markdown, Pipeline));
+}

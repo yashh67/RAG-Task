@@ -1,0 +1,62 @@
+@using ChatBot.Services.Rag
+@using Microsoft.AspNetCore.Components.Forms
+@inject DocumentLibrary Library
+
+<label class="upload @(_busy ? "busy" : "") @Class" title="PDF, DOCX, TXT or MD, up to @(Library.MaxUploadBytes / 1024 / 1024) MB each">
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+        <path d="M12 16V4m0 0-5 5m5-5 5 5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <span>@(_busy ? "Uploading…" : Label)</span>
+    <InputFile OnChange="UploadAsync" multiple accept=".pdf,.docx,.txt,.md" disabled="@_busy" />
+</label>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "Upload";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>Error messages from the last upload (empty when every file was accepted).</summary>
+    [Parameter]
+    public EventCallback<IReadOnlyList<string>> OnResult { get; set; }
+
+    private bool _busy;
+
+    private async Task UploadAsync(InputFileChangeEventArgs e)
+    {
+        _busy = true;
+        var errors = new List<string>();
+        try
+        {
+            if (e.FileCount > 20)
+            {
+                errors.Add("Please upload at most 20 files at a time.");
+                return;
+            }
+            foreach (var file in e.GetMultipleFiles(maximumFileCount: 20))
+            {
+                if (file.Size > Library.MaxUploadBytes)
+                {
+                    errors.Add($"{file.Name}: file is larger than {Library.MaxUploadBytes / 1024 / 1024} MB.");
+                    continue;
+                }
+                try
+                {
+                    await using var stream = file.OpenReadStream(Library.MaxUploadBytes);
+                    if (await Library.AddAsync(file.Name, stream, CancellationToken.None) is { } error)
+                        errors.Add(error);
+                }
+                catch (Exception ex)
+                {
+                    errors.Add($"{file.Name}: upload failed ({ex.Message}).");
+                }
+            }
+        }
+        finally
+        {
+            _busy = false;
+            await OnResult.InvokeAsync(errors);
+        }
+    }
+}
